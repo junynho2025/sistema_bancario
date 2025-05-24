@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Banco Simples</title>
+</head>
+<body>
+    <h1>Banco Simples</h1>
+    <p><strong>Saldo:</strong> R$ {{ saldo|round(2) }}</p>
+    <form method="post">
+        <input type="number" step="0.01" name="valor" placeholder="Valor" required>
+        <button type="submit" name="depositar">Depositar</button>
+        <button type="submit" name="sacar">Sacar</button>
+        <button type="submit" name="extrato">Ver Extrato</button>
+    </form>
+    {% if mensagem %}
+        <p><strong>{{ mensagem }}</strong></p>
+    {% endif %}
+    <h2>Extrato</h2>
+    {% if extrato %}
+        <ul>
+        {% for item in extrato %}
+            <li>{{ item }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Não foram realizadas movimentações.</p>
+    {% endif %}
+    <form method="post" action="python app.py">
+        <button type="submit">Atualizar Saldo</button>
+    </form>
+</body>
+</html>
