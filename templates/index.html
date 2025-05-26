@@ -6,28 +6,68 @@
 </head>
 <body>
     <h1>Banco Simples</h1>
-    <p><strong>Saldo:</strong> R$ {{ saldo|round(2) }}</p>
-    <form method="post">
-        <input type="number" step="0.01" name="valor" placeholder="Valor" required>
-        <button type="submit" name="depositar">Depositar</button>
-        <button type="submit" name="sacar">Sacar</button>
-        <button type="submit" name="extrato">Ver Extrato</button>
-    </form>
     {% if mensagem %}
         <p><strong>{{ mensagem }}</strong></p>
     {% endif %}
-    <h2>Extrato</h2>
-    {% if extrato %}
-        <ul>
-        {% for item in extrato %}
-            <li>{{ item }}</li>
-        {% endfor %}
-        </ul>
+
+    {% if not usuario_logado %}
+        <h2>Criar Usuário</h2>
+        <form method="post">
+            <input type="text" name="nome" placeholder="Nome" required>
+            <input type="text" name="cpf" placeholder="CPF" required pattern="\d{11}" maxlength="11" inputmode="numeric" title="Digite apenas números (11 dígitos)">
+            <input type="date" name="data_nascimento" placeholder="Data de Nascimento" required>
+            <input type="text" name="endereco" placeholder="Endereço (logradouro, número, cidade/UF)" required>
+            <button type="submit" name="criar_usuario">Criar Usuário</button>
+        </form>
+        <h2>Entrar</h2>
+        <form method="post">
+            <input type="text" name="cpf_login" placeholder="CPF" required pattern="\d{11}" maxlength="11" inputmode="numeric" title="Digite apenas números (11 dígitos)">
+            <button type="submit" name="login">Entrar</button>
+        </form>
     {% else %}
-        <p>Não foram realizadas movimentações.</p>
+        <p>Bem-vindo, {{ usuario_logado.nome }} (CPF: {{ usuario_logado.cpf }})</p>
+        <form method="post">
+            <button type="submit" name="logout">Sair</button>
+        </form>
+        <h2>Contas</h2>
+        {% if contas_usuario %}
+            <form method="post">
+                <label for="numero_conta">Selecione a conta:</label>
+                <select name="numero_conta" id="numero_conta">
+                    {% for conta in contas_usuario %}
+                        <option value="{{ conta.numero_conta }}"
+                        {% if conta_selecionada and conta.numero_conta == conta_selecionada.numero_conta %}selected{% endif %}>
+                            Agência: {{ conta.agencia }} | Conta: {{ conta.numero_conta }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" name="selecionar_conta">Selecionar Conta</button>
+            </form>
+            {% if conta_selecionada %}
+                <p><strong>Saldo:</strong> R$ {{ saldo|round(2) }}</p>
+                <form method="post">
+                    <input type="number" step="0.01" name="valor" placeholder="Valor" required>
+                    <button type="submit" name="depositar">Depositar</button>
+                    <button type="submit" name="sacar">Sacar</button>
+                </form>
+                <br>
+                <form method="post" style="display:inline;">
+                    <button type="submit" name="extrato">Mostrar extrato</button>
+                </form>
+                {% if extrato_texto is not none %}
+                    <h3>Extrato</h3>
+                    {% if extrato_texto %}
+                        <pre>{{ extrato_texto }}</pre>
+                    {% else %}
+                        <p>Não foram realizadas movimentações.</p>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <form method="post">
+                <button type="submit" name="criar_conta">Criar Conta</button>
+            </form>
+        {% endif %}
     {% endif %}
-    <form method="post" action="python app.py">
-        <button type="submit">Atualizar Saldo</button>
-    </form>
 </body>
 </html>
